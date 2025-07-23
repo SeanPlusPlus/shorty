@@ -23,7 +23,7 @@ This utility uses a combination of:
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/SeanPlusPlus/shorty.git
+git clone git@github.com:SeanPlusPlus/shorty.git
 cd shorty
 npm install
 ```
