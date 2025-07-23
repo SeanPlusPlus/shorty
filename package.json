@@ -1,14 +1,31 @@
 {
   "name": "shorty",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "A compact, collision-resistant, and obfuscated Base62 slug generator.",
+  "main": "slug.js",
+  "type": "module",
   "scripts": {
     "start": "node slug.js",
     "test": "node test.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "type": "module"
+  "keywords": [
+    "slug",
+    "shortener",
+    "url-safe",
+    "base62",
+    "uuid",
+    "hashing",
+    "obfuscation",
+    "crypto",
+    "slug-generator"
+  ],
+  "author": "Sean Stephenson <seanplusplus@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SeanPlusPlus/shorty.git"
+  },
+  "engines": {
+    "node": ">=14.17.0"
+  }
 }
