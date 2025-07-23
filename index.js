@@ -1,21 +1,41 @@
-// Import Node.js built-in crypto module — no need to install anything
 import crypto from 'crypto'
 
-// Base62 character set: 0–9, a–z, A–Z
-// Used for compact, URL-safe encoding
+// ---------------------------------------
+// CHARACTER SET FOR BASE62 ENCODING
+// ---------------------------------------
+// Base62 uses:
+//  - 10 digits:       0–9
+//  - 26 lowercase:    a–z
+//  - 26 uppercase:    A–Z
+// Total = 62 characters
 const BASE62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-/**
- * Converts a binary buffer into a Base62 string.
- * @param {Buffer} buffer - The input buffer (e.g., from a hash).
- * @returns {string} Base62-encoded string.
- */
-function base62Encode(buffer) {
-  // Convert buffer to a big integer (hex → decimal)
+// ---------------------------------------
+// ENCODE A NUMBER (e.g. timestamp) TO BASE62
+// ---------------------------------------
+function encodeBase62Number(n) {
+  let result = ''
+  let num = BigInt(n)
+
+  // Convert decimal number to Base62 string
+  while (num > 0) {
+    result = BASE62[num % 62n] + result
+    num /= 62n
+  }
+
+  // Return '0' if input was 0
+  return result || '0'
+}
+
+// ---------------------------------------
+// ENCODE A BINARY BUFFER (e.g. hash) TO BASE62
+// ---------------------------------------
+function encodeBase62Buffer(buffer) {
+  // Convert buffer (binary data) to a BigInt via hex
   let num = BigInt('0x' + buffer.toString('hex'))
 
   let result = ''
-  // Repeatedly divide by 62 and prepend the corresponding character
+  // Convert BigInt to Base62 string
   while (num > 0) {
     result = BASE62[num % 62n] + result
     num /= 62n
@@ -24,23 +44,47 @@ function base62Encode(buffer) {
   return result
 }
 
-/**
- * Generates a short, unique slug using UUID + SHA256 hash + Base62.
- * @param {number} n - Length of the slug to return (default: 6).
- * @returns {string} A short, URL-safe slug of length `n`.
- */
-export function generateSlug(n = 6) {
-  // Step 1: Generate a UUID (v4-style randomness)
-  const uuid = crypto.randomUUID()
+// ---------------------------------------
+// MAIN: Generate Safe, Compact Slug
+// ---------------------------------------
 
-  // Step 2: Create a SHA-256 hash of the UUID
+/**
+ * Generates a short, collision-resistant slug using:
+ * - Random UUID (v4)
+ * - SHA-256 hash
+ * - Base62 encoding
+ * - Encoded timestamp for uniqueness
+ *
+ * @param {number} length - Total slug length (default: 10)
+ * @returns {string} Compact, URL-safe slug
+ */
+export function generateSafeSlug(length = 10) {
+  // ----------------------------
+  // STEP 1: Generate randomness
+  // ----------------------------
+  const uuid = crypto.randomUUID() // v4 UUID = good source of randomness
   const hash = crypto.createHash('sha256').update(uuid).digest()
 
-  // Step 3: Encode the hash as a Base62 string
-  const encoded = base62Encode(hash)
+  // ----------------------------
+  // STEP 2: Encode random hash to Base62
+  // ----------------------------
+  // Slice to leave room for timestamp (e.g., 4 chars reserved for TS)
+  const randomLength = Math.max(4, length - 4)
+  const hashPart = encodeBase62Buffer(hash).slice(0, randomLength)
 
-  // Step 4: Return only the first `n` characters (your slug)
-  return encoded.slice(0, n)
+  // ----------------------------
+  // STEP 3: Add timestamp entropy
+  // ----------------------------
+  // Use Date.now() (in ms), modulo 62^4 to constrain length to 4 Base62 chars
+  const ts = Date.now() % (62 ** 4) // ≈ 14.7 years before rollover
+  const tsPart = encodeBase62Number(ts).padStart(4, '0') // always 4 chars
+
+  // ----------------------------
+  // STEP 4: Combine and return
+  // ----------------------------
+  return hashPart + tsPart
 }
 
-console.log(generateSlug())
+console.log(generateSafeSlug()) // Example usage
+console.log(generateSafeSlug()) // Example usage
+console.log(generateSafeSlug()) // Example usage
