@@ -1,4 +1,4 @@
-# Shorty Slug Generator
+# Slug Generator
 
 A high-entropy, compact, and obfuscated slug generator written in Node.js.
 
@@ -20,26 +20,21 @@ This utility uses a combination of:
 
 ## Usage
 
-### 1. Install dependencies
-
-No external dependencies needed. Just make sure you're using Node.js >= v14.17.0 (for `crypto.randomUUID`).
+### 1. Clone and install
 
 ```bash
-npm init -y
-npm pkg set type=module scripts.start="node slug.js"
+git clone https://github.com/SeanPlusPlus/shorty.git
+cd shorty
+npm install
 ```
 
-### 2. Add the generator
-
-Save this as `slug.js` (already done).
-
-### 3. Run it
+### 2. Run it
 
 ```bash
 npm start
 ```
 
-### 4. Sample output
+### 3. Sample output
 
 ```
 Obscured slugs:
@@ -74,4 +69,4 @@ To avoid recognizable patterns like `dhlk`, which leak creation time across slug
 
 ## License
 
-MIT. Built with care by \[you].
+MIT. Built with care by SeanPlusPlus.
