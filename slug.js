@@ -3,18 +3,10 @@ import crypto from 'crypto'
 // ---------------------------------------
 // CHARACTER SET FOR BASE62 ENCODING
 // ---------------------------------------
-// Base62 uses:
-//  - 10 digits:       0–9
-//  - 26 lowercase:    a–z
-//  - 26 uppercase:    A–Z
-// Total = 62 characters
 const BASE62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 /**
  * Encodes a number (BigInt or Number) into a Base62 string
- * 
- * @param {number|bigint} n - The number to encode
- * @returns {string} - Base62-encoded string
  */
 function encodeBase62Number(n) {
   let result = ''
@@ -30,9 +22,6 @@ function encodeBase62Number(n) {
 
 /**
  * Encodes a Buffer (e.g. hash) into a Base62 string
- * 
- * @param {Buffer} buffer - Binary buffer to encode
- * @returns {string} - Base62-encoded string
  */
 function encodeBase62Buffer(buffer) {
   const num = BigInt('0x' + buffer.toString('hex'))
@@ -59,30 +48,30 @@ function encodeBase62Buffer(buffer) {
  */
 export function generateObscuredSlug(length = 10) {
   // ---------------------------------------
-  // STEP 1: Generate UUID + hash
+  // STEP 1: Generate UUID (v4)
   // ---------------------------------------
-  // UUID v4 gives high-entropy randomness
   const uuid = crypto.randomUUID()
 
-  // Hash the UUID to further scramble and uniformize entropy
+  // ---------------------------------------
+  // STEP 2: Hash UUID using SHA-256
+  // ---------------------------------------
   const hash = crypto.createHash('sha256').update(uuid).digest()
 
   // ---------------------------------------
-  // STEP 2: Get timestamp + 1-byte randomness
+  // STEP 3: Create high-entropy timestamp
+  // Mixed entropy = (timestamp in ms * 256) + random byte
   // ---------------------------------------
-  // Multiply current time by 256 to make room for 1 random byte
   const randByte = crypto.randomBytes(1)[0]
   const mixedEntropy = BigInt(Date.now()) * 256n + BigInt(randByte)
 
   // ---------------------------------------
-  // STEP 3: Convert mixed entropy to a 6-byte buffer (48 bits)
+  // STEP 4: Convert mixed entropy to a 6-byte buffer
   // ---------------------------------------
-  // Convert BigInt to hex string and extract the last 12 hex chars (6 bytes)
   const entropyHex = mixedEntropy.toString(16).padStart(12, '0').slice(-12)
-  const entropyBuffer = Buffer.from(entropyHex, 'hex') // 6-byte buffer
+  const entropyBuffer = Buffer.from(entropyHex, 'hex') // 6 bytes
 
   // ---------------------------------------
-  // STEP 4: XOR entropy with first 6 bytes of hash
+  // STEP 5: XOR entropy buffer with first 6 bytes of hash
   // ---------------------------------------
   const obscured = Buffer.alloc(6)
   for (let i = 0; i < 6; i++) {
@@ -90,13 +79,14 @@ export function generateObscuredSlug(length = 10) {
   }
 
   // ---------------------------------------
-  // STEP 5: Combine XOR’d segment with next 6 bytes of hash
+  // STEP 6: Append 6 more bytes from hash to increase entropy
   // ---------------------------------------
-  const final = Buffer.concat([obscured, hash.slice(6, 12)]) // total: 12 bytes
+  const extraHashBytes = hash.slice(6, 12)
 
   // ---------------------------------------
-  // STEP 6: Base62 encode and slice to target length
+  // STEP 7: Base62 encode final buffer and truncate
   // ---------------------------------------
+  const final = Buffer.concat([obscured, extraHashBytes])
   return encodeBase62Buffer(final).slice(0, length)
 }
 
