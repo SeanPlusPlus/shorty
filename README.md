@@ -1,4 +1,4 @@
-# Slug Generator
+# 🐇 Shorty Slug Generator
 
 A high-entropy, compact, and obfuscated slug generator written in Node.js.
 
@@ -10,7 +10,7 @@ This utility uses a combination of:
 * XOR mixing to obscure patterns
 * Base62 encoding for short, URL-safe output
 
-## Features
+## ✨ Features
 
 * ✅ Collision-resistant (no DB lookup required)
 * ✅ URL-safe slugs (Base62)
@@ -18,12 +18,12 @@ This utility uses a combination of:
 * ✅ Fast and deterministic (in-process)
 * ✅ Obscured output (no visible timestamp patterns)
 
-## Usage
+## ⚡ Quick Start
 
 ### 1. Clone and install
 
 ```bash
-git clone git@github.com:SeanPlusPlus/shorty.git
+git clone https://github.com/SeanPlusPlus/shorty.git
 cd shorty
 npm install
 ```
@@ -34,7 +34,13 @@ npm install
 npm start
 ```
 
-### 3. Sample output
+### 3. Run tests
+
+```bash
+npm test
+```
+
+### 4. Sample output
 
 ```
 Obscured slugs:
@@ -44,7 +50,7 @@ TfGwM0ZhLd
 ...
 ```
 
-## Function Signature
+## 🛠️ Function Signature
 
 ```js
 export function generateObscuredSlug(length = 10): string
@@ -53,7 +59,7 @@ export function generateObscuredSlug(length = 10): string
 * `length`: Desired slug length (defaults to 10). Safe range: 8–16 characters.
 * Returns a **compact**, **obfuscated**, **unique** Base62 string.
 
-## How it Works
+## 🧬 How it Works
 
 1. A UUID v4 is generated.
 2. The UUID is hashed with SHA-256.
@@ -63,10 +69,25 @@ export function generateObscuredSlug(length = 10): string
 6. 6 more hash bytes are appended to increase entropy.
 7. The result is Base62 encoded and sliced to the requested length.
 
-## Why XOR the timestamp?
+## 🕵️‍♂️ Why XOR the Timestamp?
 
 To avoid recognizable patterns like `dhlk`, which leak creation time across slugs. XOR mixing ensures these patterns are hidden and output remains uniformly random.
 
-## License
+## 🧪 Testing
 
-MIT. Built with care by SeanPlusPlus.
+Run the built-in test to validate uniqueness, length, and randomness:
+
+```bash
+npm test
+```
+
+The test script:
+
+* Generates 1000 slugs
+* Verifies all are the correct length
+* Verifies all are unique
+* Displays the first 10
+
+## 📄 License
+
+MIT. Built with care by \[you].

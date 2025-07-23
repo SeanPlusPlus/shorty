@@ -1,4 +1,4 @@
-import { generateObscuredSlug } from "./slug"
+import { generateObscuredSlug } from './slug.js'
 
 const ITERATIONS = 1000
 const LENGTH = 10
