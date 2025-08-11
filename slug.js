@@ -6,24 +6,9 @@ import crypto from 'crypto'
 const BASE62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 /**
- * Encodes a number (BigInt or Number) into a Base62 string
- */
-function encodeBase62Number(n) {
-  let result = ''
-  let num = BigInt(n)
-
-  while (num > 0) {
-    result = BASE62[num % 62n] + result
-    num /= 62n
-  }
-
-  return result || '0'
-}
-
-/**
  * Encodes a Buffer (e.g. hash) into a Base62 string
  */
-function encodeBase62Buffer(buffer) {
+export function encodeBase62Buffer(buffer) {
   const num = BigInt('0x' + buffer.toString('hex'))
   let result = ''
 
